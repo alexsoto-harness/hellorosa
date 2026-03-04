@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-rosa-harness
+  labels:
+    app: hello-rosa-harness
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-rosa-harness
+  template:
+    metadata:
+      labels:
+        app: hello-rosa-harness
+    spec:
+      containers:
+        - name: hello-rosa
+          image: <+artifact.image>
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DEPLOYMENT_METHOD
+              value: "harness"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10

@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: hello-rosa-harness
+  labels:
+    app: hello-rosa-harness
+spec:
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: hello-rosa-harness
+    weight: 100
