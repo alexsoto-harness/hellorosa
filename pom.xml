@@ -14,7 +14,7 @@
 	<name>hello-rosa</name>
 	<description>Demo Spring Boot app for ROSA deployment</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
