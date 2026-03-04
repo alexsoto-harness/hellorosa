@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello ROSA!</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg viewBox="0 0 100 100" class="openshift-logo">
+                    <circle cx="50" cy="50" r="45" fill="#EE0000"/>
+                    <text x="50" y="60" text-anchor="middle" fill="white" font-size="24" font-weight="bold">OS</text>
+                </svg>
+            </div>
+            <h1>Hello from ROSA!</h1>
+            <p class="subtitle">Red Hat OpenShift Service on AWS</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>Application Info</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Hostname</span>
+                        <span class="value" th:text="${hostname}">localhost</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Deployment Method</span>
+                        <span class="value deployment-badge" th:text="${deploymentMethod}">local</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Java Version</span>
+                        <span class="value" th:text="${javaVersion}">21</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Timestamp</span>
+                        <span class="value" th:text="${timestamp}">2024-01-01 00:00:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>API Endpoints</h2>
+                <ul class="endpoint-list">
+                    <li><code>GET /api/info</code> - Application information</li>
+                    <li><code>GET /api/health</code> - Health check</li>
+                    <li><code>GET /actuator/health</code> - Spring Actuator health</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>Deployment Methods</h2>
+                <div class="methods">
+                    <div class="method">
+                        <h3>1. S2I (Source-to-Image)</h3>
+                        <p>OpenShift builds directly from source code</p>
+                    </div>
+                    <div class="method">
+                        <h3>2. Dockerfile + Registry</h3>
+                        <p>Build locally, push to external registry</p>
+                    </div>
+                    <div class="method">
+                        <h3>3. Internal Registry</h3>
+                        <p>Build locally, push to OpenShift registry</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Spring Boot on ROSA Demo</p>
+        </footer>
+    </div>
+</body>
+</html>
