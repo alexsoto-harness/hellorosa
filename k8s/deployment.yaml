@@ -16,12 +16,12 @@ spec:
     spec:
       containers:
         - name: hello-rosa
-          image: <+artifact.image>
+          image: {{.Values.image}}
           ports:
             - containerPort: 8080
           env:
             - name: DEPLOYMENT_METHOD
-              value: "harness"
+              value: {{.Values.deploymentMethod}}
           resources:
             requests:
               memory: "256Mi"
