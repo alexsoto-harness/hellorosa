@@ -1,0 +1,103 @@
+pipeline:
+  name: hello-rosa-cicd
+  identifier: hellorosacicd
+  orgIdentifier: sandbox
+  projectIdentifier: soto_sandbox
+  tags: {}
+  stages:
+    - stage:
+        name: Build and Push
+        identifier: build_and_push
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Maven Build
+                  identifier: maven_build
+                  spec:
+                    shell: Sh
+                    command: mvn clean package -DskipTests
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: Build and Push to DockerHub
+                  identifier: build_push
+                  spec:
+                    connectorRef: dockerhubalexsotoharness
+                    repo: alexsotoharness/hello-rosa
+                    tags:
+                      - <+pipeline.sequenceId>
+                      - latest
+                    dockerfile: Dockerfile.harness
+                    platform:
+                      os: Linux
+                      arch: Amd64
+          caching:
+            enabled: true
+            paths: []
+          buildIntelligence:
+            enabled: true
+    - stage:
+        name: Deploy to ROSA
+        identifier: deploy_to_rosa
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: hellorosa
+            serviceInputs:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      primaryArtifactRef: dockerhub
+                      sources:
+                        - identifier: dockerhub
+                          type: DockerRegistry
+                          spec:
+                            tag: <+pipeline.sequenceId>
+          environment:
+            environmentRef: rosadev
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: rosainfra
+          execution:
+            steps:
+              - step:
+                  name: Rolling Deployment
+                  identifier: rollingDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rolling Rollback
+                  identifier: rollingRollback
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false
+        tags: {}
+        failureStrategies:
+          - onFailure:
+              errors:
+                - AllErrors
+              action:
+                type: StageRollback
+  properties:
+    ci:
+      codebase:
+        connectorRef: alexsotoharness
+        repoName: hellorosa
+        build: <+input>
