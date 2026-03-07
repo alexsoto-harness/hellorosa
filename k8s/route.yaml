@@ -1,15 +1,30 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: hello-rosa-harness
+  {{- if .Values.sename}}
+  name: {{lower .Values.name}}-{{lower .Values.sename}}
+  {{- else }}
+  name: {{lower .Values.name}}
+  {{- end }}
   labels:
-    app: hello-rosa-harness
+    {{- if .Values.sename}}
+    app: {{lower .Values.name}}-{{lower .Values.sename}}
+    {{- else }}
+    app: {{lower .Values.name}}
+    {{- end }}
 spec:
+  {{- if .Values.host}}
+  host: {{.Values.host}}
+  {{- end}}
   port:
-    targetPort: 8080
+    targetPort: {{.Values.serviceTargetPort}}
   tls:
     termination: edge
   to:
     kind: Service
-    name: hello-rosa-harness
+    {{- if .Values.sename}}
+    name: {{lower .Values.name}}-{{lower .Values.sename}}
+    {{- else }}
+    name: {{lower .Values.name}}
+    {{- end }}
     weight: 100

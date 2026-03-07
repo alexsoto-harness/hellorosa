@@ -1,2 +1,31 @@
+name: <+service.name>
+replicas: 1
+
 image: <+artifact.image>
+dockercfg: <+artifact.imagePullSecret>
+
+sename: <+env.name>
+
+serviceType: ClusterIP
+servicePort: 8080
+serviceTargetPort: 8080
+
 deploymentMethod: harness
+
+# Resources
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Optional sections
+# env:
+#   config:
+#     KEY: value
+#   secrets:
+#     SECRET_KEY: secret_value
+# nodeSelector:
+#   kubernetes.io/os: linux

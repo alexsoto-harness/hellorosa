@@ -1,43 +1,137 @@
+{{- if .Values.env.config}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  {{- if .Values.sename}}
+  name: {{lower .Values.name}}-{{lower .Values.sename}}
+  {{- else }}
+  name: {{lower .Values.name}}
+  {{- end }}
+data:
+{{.Values.env.config | toYaml | indent 2}}
+---
+{{- end}}
+
+{{- if .Values.env.secrets}}
+apiVersion: v1
+kind: Secret
+metadata:
+  {{- if .Values.sename}}
+  name: {{lower .Values.name}}-{{lower .Values.sename}}
+  {{- else }}
+  name: {{lower .Values.name}}
+  {{- end }}
+stringData:
+{{.Values.env.secrets | toYaml | indent 2}}
+---
+{{- end}}
+
+{{- if .Values.dockercfg}}
+apiVersion: v1
+kind: Secret
+metadata:
+  {{- if .Values.sename}}
+  name: {{lower .Values.name}}-{{lower .Values.sename}}-dockercfg
+  {{- else }}
+  name: {{lower .Values.name}}-dockercfg
+  {{- end }}
+  annotations:
+    harness.io/skip-versioning: "true"
+data:
+  .dockercfg: {{.Values.dockercfg}}
+type: kubernetes.io/dockercfg
+---
+{{- end}}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-rosa-harness
+  {{- if .Values.sename}}
+  name: {{ lower .Values.name }}-{{ lower .Values.sename }}
+  {{- else }}
+  name: {{lower .Values.name}}
+  {{- end }} 
   labels:
-    app: hello-rosa-harness
+    {{- if .Values.sename}}
+    app: {{lower .Values.name}}-{{ lower .Values.sename }}
+    {{- else}}
+    app: {{lower .Values.name}}
+    {{- end}}
 spec:
-  replicas: 1
+  replicas: {{int .Values.replicas}}
   selector:
     matchLabels:
-      app: hello-rosa-harness
+      {{- if .Values.sename}}
+      app: {{lower .Values.name}}-{{ lower .Values.sename}}
+      {{- else }}
+      app: {{ lower .Values.name }}
+      {{- end}}
   template:
     metadata:
       labels:
-        app: hello-rosa-harness
+        {{- if .Values.sename}}
+        app: {{lower .Values.name}}-{{ lower .Values.sename }}
+        {{- else }}
+        app: {{lower .Values.name}}
+        {{- end }}
     spec:
+      {{- if .Values.dockercfg}}
+      imagePullSecrets:
+        {{- if .Values.sename}}
+        - name: {{lower .Values.name}}-{{lower .Values.sename}}-dockercfg
+        {{- else }}
+        - name: {{lower .Values.name}}-dockercfg
+        {{- end }}
+      {{- end}}
       containers:
-        - name: hello-rosa
+        {{- if .Values.sename }}
+        - name: {{ lower .Values.name }}-{{ lower .Values.sename }}
+        {{- else }}
+        - name: {{ lower .Values.name }}
+        {{- end}}
+          imagePullPolicy: Always
           image: {{.Values.image}}
           ports:
-            - containerPort: 8080
+            - containerPort: {{.Values.serviceTargetPort}}
+          {{- if .Values.deploymentMethod}}
           env:
             - name: DEPLOYMENT_METHOD
-              value: {{.Values.deploymentMethod}}
+              value: {{.Values.deploymentMethod | quote}}
+          {{- end}}
+          {{- if or .Values.env.config .Values.env.secrets}}
+          envFrom:
+            {{- if .Values.env.config}}
+            - configMapRef:
+                {{- if .Values.sename}}
+                name: {{lower .Values.name}}-{{lower .Values.sename}}
+                {{- else }}
+                name: {{lower .Values.name}}
+                {{- end }}
+            {{- end}}
+            {{- if .Values.env.secrets}}
+            - secretRef:
+                {{- if .Values.sename}}
+                name: {{lower .Values.name}}-{{lower .Values.sename}}
+                {{- else }}
+                name: {{lower .Values.name}}
+                {{- end }}
+            {{- end}}
+          {{- end}}
           resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
+{{ toYaml .Values.resources | indent 12 }}
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: {{.Values.serviceTargetPort}}
             initialDelaySeconds: 15
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: {{.Values.serviceTargetPort}}
             initialDelaySeconds: 30
             periodSeconds: 10
+      {{- if .Values.nodeSelector}}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+      {{- end}}
