@@ -1,0 +1,8 @@
+{
+  "name": "rosa-dev",
+  "identifier": "rosadev",
+  "orgIdentifier": "sandbox",
+  "projectIdentifier": "soto_sandbox",
+  "type": "PreProduction",
+  "yaml": "environment:\n  name: rosa-dev\n  identifier: rosadev\n  orgIdentifier: sandbox\n  projectIdentifier: soto_sandbox\n  type: PreProduction\n  tags: {}"
+}

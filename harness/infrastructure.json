@@ -1,0 +1,9 @@
+{
+  "name": "rosa-infra",
+  "identifier": "rosainfra",
+  "orgIdentifier": "sandbox",
+  "projectIdentifier": "soto_sandbox",
+  "environmentRef": "rosadev",
+  "type": "KubernetesDirect",
+  "yaml": "infrastructureDefinition:\n  name: rosa-infra\n  identifier: rosainfra\n  orgIdentifier: sandbox\n  projectIdentifier: soto_sandbox\n  environmentRef: rosadev\n  deploymentType: Kubernetes\n  type: KubernetesDirect\n  spec:\n    connectorRef: rosacluster\n    namespace: hello-rosa-harness\n    releaseName: release-<+INFRA_KEY_SHORT_ID>\n  allowSimultaneousDeployments: false"
+}

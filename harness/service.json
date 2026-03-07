@@ -1,0 +1,7 @@
+{
+  "name": "hello-rosa",
+  "identifier": "hellorosa",
+  "orgIdentifier": "sandbox",
+  "projectIdentifier": "soto_sandbox",
+  "yaml": "service:\n  name: hello-rosa\n  identifier: hellorosa\n  orgIdentifier: sandbox\n  projectIdentifier: soto_sandbox\n  serviceDefinition:\n    type: Kubernetes\n    spec:\n      manifests:\n        - manifest:\n            identifier: k8smanifests\n            type: K8sManifest\n            spec:\n              store:\n                type: Github\n                spec:\n                  connectorRef: alexsotoharness\n                  repoName: hellorosa\n                  gitFetchType: Branch\n                  branch: main\n                  paths:\n                    - k8s\n              skipResourceVersioning: false\n      artifacts:\n        primary:\n          primaryArtifactRef: dockerhub\n          sources:\n            - identifier: dockerhub\n              spec:\n                connectorRef: dockerhubalexsotoharness\n                imagePath: alexsotoharness/hello-rosa\n                tag: \"<+input>\"\n              type: DockerRegistry"
+}

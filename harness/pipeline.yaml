@@ -25,7 +25,11 @@ pipeline:
                   identifier: maven_build
                   spec:
                     shell: Sh
-                    command: mvn clean package -DskipTests
+                    command: |
+                      export JAVA_HOME=$JAVA_HOME_17_X64
+                      export PATH=$JAVA_HOME/bin:$PATH
+                      java -version
+                      mvn clean package -DskipTests
               - step:
                   type: BuildAndPushDockerRegistry
                   name: Build and Push to DockerHub
